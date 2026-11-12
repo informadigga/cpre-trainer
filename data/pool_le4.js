@@ -198,9 +198,9 @@
  o:['Plus-Minus-Interesting','Kompromiss','Abstimmung','Ober-sticht-Unter'],a:0,
  x:'Unterstützende Techniken: Consider-All-Facts, Plus-Minus-Interesting, Entscheidungsmatrix (LP 4.3). Sie schaffen Einblick in Alternativen; als alleinige Technik nur, wenn alle Stakeholder das Ergebnis akzeptieren.'},
 {id:'4-47',t:'a',eu:4,lz:'4.3.3',pts:2,src:'HB 4.3.3 (Tab. 4.1)',
- q:'In einer Entscheidungsmatrix werden zwei Alternativen bewertet. Gewichte: Kosten 3, Nutzen 2, Risiko 1. Alternative A erhält die Bewertungen Kosten 2, Nutzen 4, Risiko 3; Alternative B erhält Kosten 4, Nutzen 2, Risiko 2. Welche Aussage ist korrekt? (1 Antwort)',
+ q:'In einer Entscheidungsmatrix werden zwei Alternativen bewertet. Gewichte: Kosten 3, Nutzen 2, Risiko 1. Bewertet wird je Kriterium von 1 bis 5, wobei höhere Werte immer vorteilhafter sind (bei Kosten: günstiger, bei Risiko: geringeres Risiko). Alternative A erhält die Bewertungen Kosten 2, Nutzen 4, Risiko 3; Alternative B erhält Kosten 4, Nutzen 2, Risiko 2. Welche Aussage ist korrekt? (1 Antwort)',
  o:['A gewinnt mit 17 gewichteten Punkten.','B gewinnt mit 18 gewichteten Punkten.','A gewinnt mit 9 ungewichteten Punkten.','Beide Alternativen sind mit je 8 Punkten gleichwertig.'],a:1,
- x:'A: 3×2 + 2×4 + 1×3 = 6 + 8 + 3 = 17. B: 3×4 + 2×2 + 1×2 = 12 + 4 + 2 = 18. Die höchste gewichtete Bewertung gewinnt – also B (HB 4.3.3, Tab. 4.1).'},
+ x:'A: 3×2 + 2×4 + 1×3 = 6 + 8 + 3 = 17. B: 3×4 + 2×2 + 1×2 = 12 + 4 + 2 = 18. Da höhere Bewertungen laut Aufgabenstellung vorteilhafter sind, gewinnt die höchste gewichtete Summe – also B (HB 4.3.3, Tab. 4.1). Die ungewichtete Summe (A = 9, B = 8) ist in einer gewichteten Entscheidungsmatrix nicht maßgeblich.'},
 /* 4.4 Validierung */
 {id:'4-48',t:'a',eu:4,lz:'4.4.1',pts:1,src:'LP 4.4; HB 4.4',
  q:'Warum müssen Anforderungen validiert werden? (1 Antwort)',

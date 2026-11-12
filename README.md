@@ -1,4 +1,4 @@
-# CPRE Foundation Level – Prüfungstrainer 4.1
+# CPRE Foundation Level – Prüfungstrainer 4.2
 
 Offline-Lernwerkzeug für die IREB-Prüfung CPRE Foundation Level.
 Grundlage: Lehrplan 3.3.0 (1. April 2026), Handbuch 1.3.3 (23. Juli 2026), Glossar 2.2.0 (Oktober 2025) und Prüfungsordnung 5.6.2.
@@ -10,6 +10,8 @@ Grundlage: Lehrplan 3.3.0 (1. April 2026), Handbuch 1.3.3 (23. Juli 2026), Gloss
 - **Offizielle Übungsprüfung:** die 45 Originalfragen aus Set_Public_DE_3.3.3 mit offiziellem Lösungsschlüssel, in Originalreihenfolge und ungemischt.
 - **Kurztest:** 20 Fragen in 30 Minuten, verteilt wie die Musterprüfung im Kleinen.
 - **Lernmodus / Fehlertraining:** sofortiges Feedback mit Begründung und Quellenangabe.
+
+Oben rechts schaltest du zwischen hellem und dunklem Modus um. Ohne eigene Wahl folgt die Seite der Systemeinstellung. Diagramme bleiben auch im dunklen Modus auf weißem Grund.
 
 ## Bewertung (PO 5.6.2)
 - **A:** volle Punkte oder 0.
@@ -41,6 +43,17 @@ Grundlage: Lehrplan 3.3.0 (1. April 2026), Handbuch 1.3.3 (23. Juli 2026), Gloss
   - Die Werkzeugkategorie heißt im Handbuch „Management des RE-Prozesses“, im Lehrplan „Steuerung des RE-Prozesses“. In der Prüfung zählt der Lehrplan.
   - Fehlende Identifizierung macht Requirements Management laut Handbuch jetzt „sehr schwierig“, früher hieß es „unmöglich“.
 - Glossar 2.2 trennt Auftraggeber (bestellt das System) und Kunde (erhält das System). Eine Persona steht jetzt für Menschen, die das System nutzen oder davon profitieren. Keine Lösung im Pool ändert sich dadurch.
+
+## Änderungsverlauf
+- **4.2 (12.11.2026):** Befunde aus einem externen Einzelreview der 310 Fragen eingearbeitet.
+  - 3-31 fragt jetzt nach fachlich geeigneten, nutzerzentrierten User Storys.
+  - 3-43 nennt im Kontextdiagramm einen echten Informationsfluss.
+  - 4-47 legt die Bewertungsrichtung der Entscheidungsmatrix fest.
+  - Die Erklärung zur offiziellen Frage A0922 kennzeichnet ihre Mehrdeutigkeit, der Schlüssel B bleibt.
+  - Lernziele der IREB-Fragen folgen den offiziellen EO-Angaben, außer wo der Lehrplan 3.3.0 das Lernziel verschoben hat (P0113: 1.3.2 → 1.1.2) oder es nicht mehr gibt (A0922: 7.1.2 → 7.1.1).
+  - Neu ist außerdem der Schalter für den hellen und dunklen Modus.
+- **4.1 (11.11.2026):** Abgleich mit Handbuch 1.3.3 und Glossar 2.2, fünf neue Fragen.
+- **4.0 (11.11.2026):** Neuaufbau für Lehrplan 3.3.0 mit 260 Fragen und Prüfungssimulation nach PO 5.6.2.
 
 ## Grenzen
 - Die eigenen Fragen sind **keine** echten Prüfungsfragen. Sie sind nach Stil und Schwierigkeit der Musterprüfung gebaut.

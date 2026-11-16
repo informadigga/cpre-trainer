@@ -13,7 +13,7 @@ Grundlage: Lehrplan 3.3.0 (1. April 2026), Handbuch 1.3.3 (23. Juli 2026), Gloss
 
 Oben rechts schaltest du zwischen hellem und dunklem Modus um. Ohne eigene Wahl folgt die Seite der Systemeinstellung. Diagramme bleiben auch im dunklen Modus auf weißem Grund.
 
-## Lernvariante 2: externer Fragenkatalog (nur lokal)
+## Lernvariante 2: externer Fragenkatalog
 Wenn die Datei `data/extern_certquiz.js` vorhanden ist, zeigt die Startseite einen zusätzlichen Bereich „Lernvariante 2: Fragenkatalog von CertQuiz“. Er enthält 306 Fragen aus einem Export von certquiz.app.
 - Der Katalog ist vom eigenen Pool getrennt. Er zählt nicht zur Prüfungssimulation und nicht zu „Dein Stand“. Er hat ein eigenes Fehlertraining.
 - Jede Frage hat einen Prüfvermerk gegen Lehrplan 3.3.0, Handbuch 1.3.3 und Glossar 2.2.
@@ -21,7 +21,7 @@ Wenn die Datei `data/extern_certquiz.js` vorhanden ist, zeigt die Startseite ein
 - Die Antwortlängen sind ausgeglichen. Die richtige Antwort ist bei Einfachauswahl in 23 % der Fälle die längste, vorher waren es 65 % (Zufall: 25 %). Bei K-Fragen ist die längste Aussage nicht mehr überdurchschnittlich oft richtig.
 - 7 Fragen mit fehlerhafter oder mehrdeutiger Lösung sind ausgeblendet.
 - Standardmäßig werden nur lehrplanrelevante Fragen gezeigt.
-- Die Datei ist nur für die persönliche Prüfungsvorbereitung gedacht. Deshalb steht sie in `.gitignore` und ist nicht Teil des öffentlichen Repos.
+- Die Fragen stammen von CertQuiz und sind mit Zustimmung des Betreibers eingebunden. Sie sind nur für die persönliche Prüfungsvorbereitung gedacht.
 
 ## Bewertung (PO 5.6.2)
 - **A:** volle Punkte oder 0.

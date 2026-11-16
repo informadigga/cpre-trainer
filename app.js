@@ -16,7 +16,7 @@ const IREB=(window.IREB_EXAM||[]).map(q=>Object.assign({lab:['Richtig','Falsch']
 const BYID=new Map([...POOL,...IREB].map(q=>[q.origin+':'+q.id,q]));
 /* Lernvariante 2: externer Fragenkatalog (optional, nur wenn data/extern_certquiz.js vorhanden ist) */
 let CQ=[],CQ_ALL=[],CQ_META=null;
-const CQ_STATUS={ok:['','Ohne Befund'],hinweis:['hint','Hinweis'],extern:['out','Außerhalb Lehrplan'],veraltet:['out','Veraltet'],'fragwürdig':['warn','Fragwürdig'],fehler:['fix','Schlüssel korrigiert'],aus:['bad','Ausgeblendet']};
+const CQ_STATUS={ok:['','Ohne Befund'],hinweis:['hint','Hinweis'],extern:['out','Außerhalb Lehrplan'],veraltet:['out','Veraltet'],'fragwürdig':['warn','Fragwürdig'],fehler:['fix','Schlüssel korrigiert'],'überarbeitet':['hint','Überarbeitet'],aus:['bad','Ausgeblendet']};
 function initCQ(){
   if(!window.EXTERN_CQ||!Array.isArray(window.EXTERN_CQ.questions))return;
   CQ_META=window.EXTERN_CQ.meta||{};
@@ -212,7 +212,7 @@ function cqSection(){
   return `<section class="panel extern-panel">
     <div class="ext-head"><span class="tag ext">EXTERN</span><h2>Lernvariante 2: Fragenkatalog von CertQuiz</h2></div>
     <p>${CQ_ALL.length} Fragen aus einem Export von certquiz.app. Sie sind getrennt von deinem Pool, zählen nicht zur Prüfungssimulation und nicht zu „Dein Stand“. Lösungen und Erklärungen stammen von CertQuiz. Jede Frage hat zusätzlich einen Prüfvermerk gegen Lehrplan 3.3.0, Handbuch 1.3.3 und Glossar 2.2.</p>
-    <p class="muted small-print">${cnt('ok')} ohne Befund · ${cnt('hinweis')} mit Hinweis · ${cnt('fragwürdig')} fragwürdig · ${cnt('extern')+cnt('veraltet')} außerhalb des Lehrplans oder veraltet · ${cnt('fehler')} mit korrigiertem Schlüssel · ${cnt('aus')} wegen fehlerhafter Lösung ausgeblendet</p>
+    <p class="muted small-print">${[['ok','ohne Befund'],['überarbeitet','an Lehrplan und Handbuch angepasst'],['hinweis','mit Hinweis'],['fragwürdig','fragwürdig'],['extern','außerhalb des Lehrplans'],['veraltet','veraltet'],['fehler','mit korrigiertem Schlüssel'],['aus','wegen fehlerhafter Lösung ausgeblendet']].filter(([k])=>cnt(k)).map(([k,t])=>cnt(k)+' '+t).join(' · ')}. Die Antwortlängen sind ausgeglichen, damit die längste Antwort kein Hinweis auf die Lösung ist.</p>
     <div class="le-pick cq-pick">${[1,2,3,4,5,6,7].map(e=>`<label title="${esc(LE_TITLES[e])}"><input type="checkbox" value="${e}" checked> Kap. ${e} <span class="muted">(${per(e)})</span></label>`).join('')}</div>
     <label class="check"><input type="checkbox" id="cq-core" ${DB.cqAll?'':'checked'}> Nur lehrplanrelevante Fragen (ohne „außerhalb Lehrplan“ und „veraltet“)</label>
     <div class="ext-actions">

@@ -18,7 +18,7 @@ Wenn die Datei `data/extern_certquiz.js` vorhanden ist, zeigt die Startseite ein
 - Der Katalog ist vom eigenen Pool getrennt. Er zählt nicht zur Prüfungssimulation und nicht zu „Dein Stand“. Er hat ein eigenes Fehlertraining.
 - Jede Frage hat einen Prüfvermerk gegen Lehrplan 3.3.0, Handbuch 1.3.3 und Glossar 2.2.
 - 33 Fragen mit Hinweis, fragwürdigem Inhalt oder veraltetem Bezug wurden inhaltlich an Lehrplan, Handbuch und Glossar angepasst.
-- Die Antwortlängen sind ausgeglichen. Die richtige Antwort ist bei Einfachauswahl in 25 % der Fälle die längste, vorher waren es 65 %. Bei K-Fragen ist die längste Aussage nicht mehr überdurchschnittlich oft richtig.
+- Die Antwortlängen sind ausgeglichen. Die richtige Antwort ist bei Einfachauswahl in 23 % der Fälle die längste, vorher waren es 65 % (Zufall: 25 %). Bei K-Fragen ist die längste Aussage nicht mehr überdurchschnittlich oft richtig.
 - 7 Fragen mit fehlerhafter oder mehrdeutiger Lösung sind ausgeblendet.
 - Standardmäßig werden nur lehrplanrelevante Fragen gezeigt.
 - Die Datei ist nur für die persönliche Prüfungsvorbereitung gedacht. Deshalb steht sie in `.gitignore` und ist nicht Teil des öffentlichen Repos.

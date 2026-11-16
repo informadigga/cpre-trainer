@@ -178,7 +178,6 @@ function renderHome(){
       <button class="btn" data-start="wrong" ${wrong?'':'disabled'}>Fehler wiederholen</button>
     </article>
   </div>
-  ${CQ.length?cqSection():''}
   <section class="panel">
     <h2>Dein Stand</h2>
     <p class="muted">${seenN} von ${POOL.length} eigenen Fragen bearbeitet. Quote = Anteil der Punkte beim jeweils letzten Versuch.</p>
@@ -186,6 +185,7 @@ function renderHome(){
     ${hist.length?`<h3>Letzte Durchgänge</h3><ul class="hist">${hist.map(h=>`<li><span>${new Date(h.ts).toLocaleString('de-DE',{dateStyle:'short',timeStyle:'short'})}</span><span>${esc(h.name)}</span><strong class="${h.passed?'ok':'bad'}">${fmtNum(h.pct)} %</strong></li>`).join('')}</ul>`:''}
     <button class="btn ghost small" id="reset">Lernstand zurücksetzen</button>
   </section>
+  ${CQ.length?cqSection():''}
   <section class="panel info">
     <h2>So funktioniert die Bewertung (Prüfungsordnung 5.6.2)</h2>
     <ul>
@@ -198,10 +198,9 @@ function renderHome(){
   $('#ext').onchange=e=>{DB.ext=e.target.checked;save();};
   $('#reset').onclick=()=>{if(confirm('Statistik und Verlauf wirklich löschen?')){DB.stats={};DB.history=[];save();renderHome();}};
   if(hasSession){$('#resume').onclick=()=>{S=DB.session;renderQuestion();startTimer();};$('#discard').onclick=()=>{DB.session=null;save();renderHome();};}
-  const cc=$('#cq-core');if(cc)cc.onchange=e=>{DB.cqAll=!e.target.checked;save();renderHome();};
   app.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>start(b.dataset.start));
 }
-function cqPool(){return CQ.filter(q=>DB.cqAll||(q.st!=='extern'&&q.st!=='veraltet'));}
+function cqPool(){return CQ.filter(q=>q.st!=='extern'&&q.st!=='veraltet');}
 function cqSection(){
   const cnt=k=>CQ_ALL.filter(q=>q.st===k).length;
   const pool=cqPool();
@@ -210,11 +209,9 @@ function cqSection(){
   const wrong=pool.filter(q=>{const x=DB.stats[qkey(q)];return x&&x.last<1;}).length;
   const per=e=>pool.filter(q=>q.eu===e).length;
   return `<section class="panel extern-panel">
-    <div class="ext-head"><span class="tag ext">EXTERN</span><h2>Lernvariante 2: Fragenkatalog von CertQuiz</h2></div>
-    <p>${CQ_ALL.length} Fragen aus einem Export von certquiz.app. Sie sind getrennt von deinem Pool, zählen nicht zur Prüfungssimulation und nicht zu „Dein Stand“. Lösungen und Erklärungen stammen von CertQuiz. Jede Frage hat zusätzlich einen Prüfvermerk gegen Lehrplan 3.3.0, Handbuch 1.3.3 und Glossar 2.2.</p>
-    <p class="muted small-print">${[['ok','ohne Befund'],['überarbeitet','an Lehrplan und Handbuch angepasst'],['hinweis','mit Hinweis'],['fragwürdig','fragwürdig'],['extern','außerhalb des Lehrplans'],['veraltet','veraltet'],['fehler','mit korrigiertem Schlüssel'],['aus','wegen fehlerhafter Lösung ausgeblendet']].filter(([k])=>cnt(k)).map(([k,t])=>cnt(k)+' '+t).join(' · ')}. Die Antwortlängen sind ausgeglichen, damit die längste Antwort kein Hinweis auf die Lösung ist.</p>
+    <div class="ext-head"><span class="tag ext">EXTERN</span><h2>Lernvariante 2: Externer Fragenkatalog</h2></div>
+    <p>${pool.length} zusätzliche Fragen zum Üben, getrennt von deinem Pool. Sie zählen nicht zur Prüfungssimulation und nicht zu „Dein Stand“.</p>
     <div class="le-pick cq-pick">${[1,2,3,4,5,6,7].map(e=>`<label title="${esc(LE_TITLES[e])}"><input type="checkbox" value="${e}" checked> Kap. ${e} <span class="muted">(${per(e)})</span></label>`).join('')}</div>
-    <label class="check"><input type="checkbox" id="cq-core" ${DB.cqAll?'':'checked'}> Nur lehrplanrelevante Fragen (ohne „außerhalb Lehrplan“ und „veraltet“)</label>
     <div class="ext-actions">
       <label class="inline">Anzahl <select id="cq-n"><option>10</option><option selected>20</option><option>45</option><option value="999">alle</option></select></label>
       <button class="btn" data-start="cq">Lernen starten</button>
@@ -245,13 +242,13 @@ function start(mode){
     if(!eus.length){alert('Bitte mindestens ein Kapitel wählen.');return;}
     const qs=mode==='cq'?pickCQ(eus,+$('#cq-n').value,false):pickCQ(eus,999,true);
     if(!qs.length){alert('Für diese Auswahl gibt es keine Fragen.');return;}
-    newSession(mode,qs,{name:mode==='cq'?'CertQuiz-Katalog (extern)':'CertQuiz-Fehlertraining (extern)',feedback:true});
+    newSession(mode,qs,{name:mode==='cq'?'Externer Fragenkatalog':'Externer Fragenkatalog – Fehler',feedback:true});
   }
 }
 
 /* ---------- Frage ---------- */
-function cqBadge(q){if(q.origin!=='cq'||!q.st||q.st==='ok')return '';const b=CQ_STATUS[q.st]||['',q.st];return `<span class="tag st-${b[0]}">${esc(b[1])}</span>`;}
-function cqNote(q){return q.origin==='cq'&&q.note?`<div class="cq-note"><b>Prüfvermerk (Abgleich mit Lehrplan/Handbuch):</b> ${esc(q.note)}</div>`:'';}
+function cqBadge(q){return '';const b=CQ_STATUS[q.st]||['',q.st];return `<span class="tag st-${b[0]}">${esc(b[1])}</span>`;}
+function cqNote(q){return false&&q.note?`<div class="cq-note"><b>Prüfvermerk (Abgleich mit Lehrplan/Handbuch):</b> ${esc(q.note)}</div>`:'';}
 function typeLabel(q){return {a:'A · Einfachauswahl',p:'P · Mehrfachauswahl',k:'K · Richtig/Falsch'}[q.t];}
 function figure(q){
   if(q.svg)return `<figure class="fig">${q.svg}</figure>`;
@@ -279,7 +276,7 @@ function renderQuestion(){
     if(multi){const c=Array.isArray(ans)?ans.length:0;body+=`<p class="count ${c>q.a.length?'over':''}">${c} von ${q.a.length} ausgewählt${c>q.a.length?' – mehr als gefordert ergibt 0 Punkte!':''}</p>`;}
   }
   let fb='';
-  if(reveal){const sc=score(q,ans);fb=`<div class="feedback ${sc===q.pts?'good':sc>0?'part':'bad'}"><strong>${sc===q.pts?'Richtig':sc>0?'Teilweise richtig':'Nicht richtig'} – ${fmtNum(sc)} von ${q.pts} Punkt${q.pts>1?'en':''}</strong><p>${q.origin==='cq'?'<b>Erklärung von CertQuiz:</b> ':''}${esc(q.x)}</p>${q.src?`<small>Quelle: ${esc(q.src)}</small>`:''}</div>${cqNote(q)}`;}
+  if(reveal){const sc=score(q,ans);fb=`<div class="feedback ${sc===q.pts?'good':sc>0?'part':'bad'}"><strong>${sc===q.pts?'Richtig':sc>0?'Teilweise richtig':'Nicht richtig'} – ${fmtNum(sc)} von ${q.pts} Punkt${q.pts>1?'en':''}</strong><p>${esc(q.x)}</p>${q.src&&q.origin!=='cq'?`<small>Quelle: ${esc(q.src)}</small>`:''}</div>${cqNote(q)}`;}
   app.innerHTML=`
   <div class="bar-top">
     <button class="link" id="quit">← Menü</button>
@@ -289,7 +286,7 @@ function renderQuestion(){
   <div class="progress"><span style="width:${100*done/n}%"></span></div>
   <div class="qmeta"><span>Frage ${i+1} von ${n}</span><span>${done} beantwortet</span></div>
   <article class="question">
-    <div class="tags">${q.origin==='cq'?'<span class="tag ext">EXTERN · CertQuiz</span>':''}<span class="tag dark">${esc(q.origin==='pool'?'#'+q.id:q.id)}</span><span class="tag">${typeLabel(q)}</span><span class="tag">${q.pts} Punkt${q.pts>1?'e':''}</span><span class="tag light">${q.origin==='cq'?'Kapitel '+q.eu:'LE '+q.eu+' · LZ '+esc(q.lz)}</span>${cqBadge(q)}</div>
+    <div class="tags">${q.origin==='cq'?'<span class="tag ext">EXTERN</span>':''}<span class="tag dark">${esc(q.origin==='pool'?'#'+q.id:q.id)}</span><span class="tag">${typeLabel(q)}</span><span class="tag">${q.pts} Punkt${q.pts>1?'e':''}</span><span class="tag light">${q.origin==='cq'?'Kapitel '+q.eu:'LE '+q.eu+' · LZ '+esc(q.lz)}</span>${cqBadge(q)}</div>
     <h2 class="qtext">${esc(q.q)}</h2>
     ${figure(q)}
     ${body}
@@ -348,7 +345,7 @@ function renderResults(timeout){
     if(q.t==='k')det=q.s.map((s,o)=>{const v=ans?ans[o]:null;return `<li class="${v===q.a[o]?'r':'w'}">${esc(s)}<br><small>Richtig: <b>${esc(q.a[o]?q.lab[0]:q.lab[1])}</b> · Deine Antwort: ${v==null?'–':esc(v?q.lab[0]:q.lab[1])}</small></li>`;}).join('');
     else det=q.o.map((o,k)=>{const right=q.t==='a'?q.a===k:q.a.includes(k);const sel=q.t==='a'?ans===k:Array.isArray(ans)&&ans.includes(k);return `<li class="${right?'r':''} ${sel&&!right?'w':''}">${esc(o)} ${right?'<b>✓ richtig</b>':''}${sel?' <i>(deine Wahl)</i>':''}</li>`;}).join('');
     return `<details class="rev ${cls}" ${cls!=='good'?'open':''} data-cls="${cls}"><summary><span class="tag ${cls}">${fmtNum(sc)}/${q.pts}</span> <b>${j+1}.</b> ${esc(q.q.split('\n')[0].slice(0,160))}${q.q.length>160?'…':''}</summary>
-      <div class="rev-body"><p class="qtext small">${esc(q.q)}</p>${figure(q)}<ul class="ans">${det}</ul><div class="explain"><b>${q.origin==='cq'?'Erklärung von CertQuiz':'Erläuterung'}:</b> ${esc(q.x)}<br><small>${q.src?'Quelle: '+esc(q.src)+' · ':''}${q.origin==='cq'?'Kapitel '+q.eu:'LE '+q.eu+' · LZ '+esc(q.lz)}</small></div>${cqNote(q)}</div></details>`;}).join('');
+      <div class="rev-body"><p class="qtext small">${esc(q.q)}</p>${figure(q)}<ul class="ans">${det}</ul><div class="explain"><b>Erläuterung:</b> ${esc(q.x)}<br><small>${q.src&&q.origin!=='cq'?'Quelle: '+esc(q.src)+' · ':''}${q.origin==='cq'?'Kapitel '+q.eu:'LE '+q.eu+' · LZ '+esc(q.lz)}</small></div>${cqNote(q)}</div></details>`;}).join('');
   app.innerHTML=`
   <section class="result ${passed?'pass':'fail'}">
     <p class="eyebrow">${esc(S.name)}${timeout?' · Zeit abgelaufen':''}</p>

@@ -14,6 +14,16 @@ const KEY='cpre-fl-trainer-v4';
 const POOL=(window.POOL||[]).map(q=>Object.assign({src:'',lab:['Richtig','Falsch']},q,{origin:'pool'}));
 const IREB=(window.IREB_EXAM||[]).map(q=>Object.assign({lab:['Richtig','Falsch']},q,{origin:'ireb'}));
 const BYID=new Map([...POOL,...IREB].map(q=>[q.origin+':'+q.id,q]));
+/* Lernvariante 2: externer Fragenkatalog (optional, nur wenn data/extern_certquiz.js vorhanden ist) */
+let CQ=[],CQ_ALL=[],CQ_META=null;
+const CQ_STATUS={ok:['','Ohne Befund'],hinweis:['hint','Hinweis'],extern:['out','Außerhalb Lehrplan'],veraltet:['out','Veraltet'],'fragwürdig':['warn','Fragwürdig'],fehler:['fix','Schlüssel korrigiert'],aus:['bad','Ausgeblendet']};
+function initCQ(){
+  if(!window.EXTERN_CQ||!Array.isArray(window.EXTERN_CQ.questions))return;
+  CQ_META=window.EXTERN_CQ.meta||{};
+  CQ_ALL=window.EXTERN_CQ.questions;
+  CQ=CQ_ALL.filter(q=>q.st!=='aus').map(q=>Object.assign({lab:['Richtig','Falsch'],lz:'',src:''},q,{origin:'cq'}));
+  CQ.forEach(q=>BYID.set('cq:'+q.id,q));
+}
 const DIAGRAMS=window.DIAGRAMS||{};
 const $=s=>document.querySelector(s);
 const app=$('#app');
@@ -101,7 +111,7 @@ function newSession(mode,qs,opts){
   stopTimer();
   const fixedOrder=mode==='ireb';
   S={mode,name:opts.name,ids:qs.map(qkey),
-     perm:qs.map(q=>fixedOrder?null:shuffle([...(q.t==='k'?q.s:q.o).keys()])),
+     perm:qs.map(q=>(fixedOrder||q.origin==='cq')?null:shuffle([...(q.t==='k'?q.s:q.o).keys()])),
      ans:qs.map(q=>q.t==='k'?Array(q.s.length).fill(null):null),
      checked:qs.map(()=>false),flag:qs.map(()=>false),at:0,
      feedback:!!opts.feedback,timed:!!opts.minutes,remaining:opts.minutes?opts.minutes*60:0,started:Date.now(),done:false};
@@ -168,6 +178,7 @@ function renderHome(){
       <button class="btn" data-start="wrong" ${wrong?'':'disabled'}>Fehler wiederholen</button>
     </article>
   </div>
+  ${CQ.length?cqSection():''}
   <section class="panel">
     <h2>Dein Stand</h2>
     <p class="muted">${seenN} von ${POOL.length} eigenen Fragen bearbeitet. Quote = Anteil der Punkte beim jeweils letzten Versuch.</p>
@@ -187,7 +198,36 @@ function renderHome(){
   $('#ext').onchange=e=>{DB.ext=e.target.checked;save();};
   $('#reset').onclick=()=>{if(confirm('Statistik und Verlauf wirklich löschen?')){DB.stats={};DB.history=[];save();renderHome();}};
   if(hasSession){$('#resume').onclick=()=>{S=DB.session;renderQuestion();startTimer();};$('#discard').onclick=()=>{DB.session=null;save();renderHome();};}
+  const cc=$('#cq-core');if(cc)cc.onchange=e=>{DB.cqAll=!e.target.checked;save();renderHome();};
   app.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>start(b.dataset.start));
+}
+function cqPool(){return CQ.filter(q=>DB.cqAll||(q.st!=='extern'&&q.st!=='veraltet'));}
+function cqSection(){
+  const cnt=k=>CQ_ALL.filter(q=>q.st===k).length;
+  const pool=cqPool();
+  const st=pool.map(q=>DB.stats[qkey(q)]).filter(Boolean);
+  const avg=st.length?st.reduce((a,x)=>a+x.last,0)/st.length:null;
+  const wrong=pool.filter(q=>{const x=DB.stats[qkey(q)];return x&&x.last<1;}).length;
+  const per=e=>pool.filter(q=>q.eu===e).length;
+  return `<section class="panel extern-panel">
+    <div class="ext-head"><span class="tag ext">EXTERN</span><h2>Lernvariante 2: Fragenkatalog von CertQuiz</h2></div>
+    <p>${CQ_ALL.length} Fragen aus einem Export von certquiz.app. Sie sind getrennt von deinem Pool, zählen nicht zur Prüfungssimulation und nicht zu „Dein Stand“. Lösungen und Erklärungen stammen von CertQuiz. Jede Frage hat zusätzlich einen Prüfvermerk gegen Lehrplan 3.3.0, Handbuch 1.3.3 und Glossar 2.2.</p>
+    <p class="muted small-print">${cnt('ok')} ohne Befund · ${cnt('hinweis')} mit Hinweis · ${cnt('fragwürdig')} fragwürdig · ${cnt('extern')+cnt('veraltet')} außerhalb des Lehrplans oder veraltet · ${cnt('fehler')} mit korrigiertem Schlüssel · ${cnt('aus')} wegen fehlerhafter Lösung ausgeblendet</p>
+    <div class="le-pick cq-pick">${[1,2,3,4,5,6,7].map(e=>`<label title="${esc(LE_TITLES[e])}"><input type="checkbox" value="${e}" checked> Kap. ${e} <span class="muted">(${per(e)})</span></label>`).join('')}</div>
+    <label class="check"><input type="checkbox" id="cq-core" ${DB.cqAll?'':'checked'}> Nur lehrplanrelevante Fragen (ohne „außerhalb Lehrplan“ und „veraltet“)</label>
+    <div class="ext-actions">
+      <label class="inline">Anzahl <select id="cq-n"><option>10</option><option selected>20</option><option>45</option><option value="999">alle</option></select></label>
+      <button class="btn" data-start="cq">Lernen starten</button>
+      <button class="btn ghost" data-start="cqwrong" ${wrong?'':'disabled'}>Fehler wiederholen (${wrong})</button>
+    </div>
+    <p class="muted">${st.length} von ${pool.length} bearbeitet${avg==null?'':` · Quote beim letzten Versuch ${Math.round(avg*100)} %`}</p>
+  </section>`;
+}
+function pickCQ(eus,n,onlyWrong){
+  let cand=cqPool().filter(q=>eus.includes(q.eu));
+  if(onlyWrong)cand=cand.filter(q=>{const x=DB.stats[qkey(q)];return x&&x.last<1;});
+  cand=shuffle(cand).sort((a,b)=>seen(a)-seen(b));
+  return shuffle(cand.slice(0,n));
 }
 function start(mode){
   if(DB.session&&!DB.session.done&&!confirm('Die unterbrochene Sitzung wird verworfen. Fortfahren?'))return;
@@ -200,11 +240,21 @@ function start(mode){
     const n=+$('#learn-n').value;newSession('learn',pickLearn(eus,n,false),{name:'Lernmodus (LE '+eus.join(', ')+')',feedback:true});
   }
   else if(mode==='wrong'){newSession('wrong',pickLearn([1,2,3,4,5,6,7],999,true),{name:'Fehlertraining',feedback:true});}
+  else if(mode==='cq'||mode==='cqwrong'){
+    const eus=[...app.querySelectorAll('.cq-pick input:checked')].map(i=>+i.value);
+    if(!eus.length){alert('Bitte mindestens ein Kapitel wählen.');return;}
+    const qs=mode==='cq'?pickCQ(eus,+$('#cq-n').value,false):pickCQ(eus,999,true);
+    if(!qs.length){alert('Für diese Auswahl gibt es keine Fragen.');return;}
+    newSession(mode,qs,{name:mode==='cq'?'CertQuiz-Katalog (extern)':'CertQuiz-Fehlertraining (extern)',feedback:true});
+  }
 }
 
 /* ---------- Frage ---------- */
+function cqBadge(q){if(q.origin!=='cq'||!q.st||q.st==='ok')return '';const b=CQ_STATUS[q.st]||['',q.st];return `<span class="tag st-${b[0]}">${esc(b[1])}</span>`;}
+function cqNote(q){return q.origin==='cq'&&q.note?`<div class="cq-note"><b>Prüfvermerk (Abgleich mit Lehrplan/Handbuch):</b> ${esc(q.note)}</div>`:'';}
 function typeLabel(q){return {a:'A · Einfachauswahl',p:'P · Mehrfachauswahl',k:'K · Richtig/Falsch'}[q.t];}
 function figure(q){
+  if(q.svg)return `<figure class="fig">${q.svg}</figure>`;
   if(q.img)return `<figure class="fig"><img src="${esc(q.img)}" alt="Diagramm zur Frage ${esc(q.id)}"></figure>`;
   if(q.d&&DIAGRAMS[q.d])return `<figure class="fig">${DIAGRAMS[q.d]}</figure>`;
   return '';
@@ -229,7 +279,7 @@ function renderQuestion(){
     if(multi){const c=Array.isArray(ans)?ans.length:0;body+=`<p class="count ${c>q.a.length?'over':''}">${c} von ${q.a.length} ausgewählt${c>q.a.length?' – mehr als gefordert ergibt 0 Punkte!':''}</p>`;}
   }
   let fb='';
-  if(reveal){const sc=score(q,ans);fb=`<div class="feedback ${sc===q.pts?'good':sc>0?'part':'bad'}"><strong>${sc===q.pts?'Richtig':sc>0?'Teilweise richtig':'Nicht richtig'} – ${fmtNum(sc)} von ${q.pts} Punkt${q.pts>1?'en':''}</strong><p>${esc(q.x)}</p>${q.src?`<small>Quelle: ${esc(q.src)}</small>`:''}</div>`;}
+  if(reveal){const sc=score(q,ans);fb=`<div class="feedback ${sc===q.pts?'good':sc>0?'part':'bad'}"><strong>${sc===q.pts?'Richtig':sc>0?'Teilweise richtig':'Nicht richtig'} – ${fmtNum(sc)} von ${q.pts} Punkt${q.pts>1?'en':''}</strong><p>${q.origin==='cq'?'<b>Erklärung von CertQuiz:</b> ':''}${esc(q.x)}</p>${q.src?`<small>Quelle: ${esc(q.src)}</small>`:''}</div>${cqNote(q)}`;}
   app.innerHTML=`
   <div class="bar-top">
     <button class="link" id="quit">← Menü</button>
@@ -239,7 +289,7 @@ function renderQuestion(){
   <div class="progress"><span style="width:${100*done/n}%"></span></div>
   <div class="qmeta"><span>Frage ${i+1} von ${n}</span><span>${done} beantwortet</span></div>
   <article class="question">
-    <div class="tags"><span class="tag dark">${esc(q.origin==='ireb'?q.id:'#'+q.id)}</span><span class="tag">${typeLabel(q)}</span><span class="tag">${q.pts} Punkt${q.pts>1?'e':''}</span><span class="tag light">LE ${q.eu} · LZ ${esc(q.lz)}</span></div>
+    <div class="tags">${q.origin==='cq'?'<span class="tag ext">EXTERN · CertQuiz</span>':''}<span class="tag dark">${esc(q.origin==='pool'?'#'+q.id:q.id)}</span><span class="tag">${typeLabel(q)}</span><span class="tag">${q.pts} Punkt${q.pts>1?'e':''}</span><span class="tag light">${q.origin==='cq'?'Kapitel '+q.eu:'LE '+q.eu+' · LZ '+esc(q.lz)}</span>${cqBadge(q)}</div>
     <h2 class="qtext">${esc(q.q)}</h2>
     ${figure(q)}
     ${body}
@@ -298,7 +348,7 @@ function renderResults(timeout){
     if(q.t==='k')det=q.s.map((s,o)=>{const v=ans?ans[o]:null;return `<li class="${v===q.a[o]?'r':'w'}">${esc(s)}<br><small>Richtig: <b>${esc(q.a[o]?q.lab[0]:q.lab[1])}</b> · Deine Antwort: ${v==null?'–':esc(v?q.lab[0]:q.lab[1])}</small></li>`;}).join('');
     else det=q.o.map((o,k)=>{const right=q.t==='a'?q.a===k:q.a.includes(k);const sel=q.t==='a'?ans===k:Array.isArray(ans)&&ans.includes(k);return `<li class="${right?'r':''} ${sel&&!right?'w':''}">${esc(o)} ${right?'<b>✓ richtig</b>':''}${sel?' <i>(deine Wahl)</i>':''}</li>`;}).join('');
     return `<details class="rev ${cls}" ${cls!=='good'?'open':''} data-cls="${cls}"><summary><span class="tag ${cls}">${fmtNum(sc)}/${q.pts}</span> <b>${j+1}.</b> ${esc(q.q.split('\n')[0].slice(0,160))}${q.q.length>160?'…':''}</summary>
-      <div class="rev-body"><p class="qtext small">${esc(q.q)}</p>${figure(q)}<ul class="ans">${det}</ul><div class="explain"><b>Erläuterung:</b> ${esc(q.x)}${q.src?`<br><small>Quelle: ${esc(q.src)} · LE ${q.eu} · LZ ${esc(q.lz)}</small>`:`<br><small>LE ${q.eu} · LZ ${esc(q.lz)}</small>`}</div></div></details>`;}).join('');
+      <div class="rev-body"><p class="qtext small">${esc(q.q)}</p>${figure(q)}<ul class="ans">${det}</ul><div class="explain"><b>${q.origin==='cq'?'Erklärung von CertQuiz':'Erläuterung'}:</b> ${esc(q.x)}<br><small>${q.src?'Quelle: '+esc(q.src)+' · ':''}${q.origin==='cq'?'Kapitel '+q.eu:'LE '+q.eu+' · LZ '+esc(q.lz)}</small></div>${cqNote(q)}</div></details>`;}).join('');
   app.innerHTML=`
   <section class="result ${passed?'pass':'fail'}">
     <p class="eyebrow">${esc(S.name)}${timeout?' · Zeit abgelaufen':''}</p>
@@ -326,5 +376,6 @@ document.addEventListener('keydown',e=>{
   else if(/^[1-5]$/.test(e.key)){const el=app.querySelectorAll('[data-o]')[+e.key-1];if(el&&!el.disabled){el.click();}}
 });
 $('#nav-home').onclick=()=>{if(S&&!S.done)save();stopTimer();S=S&&S.done?null:S;renderHome();};
+initCQ();
 if(!POOL.length||!IREB.length){app.innerHTML='<p class="panel">Fragendaten konnten nicht geladen werden. Bitte die ZIP-Datei vollständig entpacken und index.html aus dem entpackten Ordner öffnen.</p>';}
 else renderHome();

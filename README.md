@@ -1,4 +1,4 @@
-# CPRE Foundation Level – Prüfungstrainer 4.2
+# CPRE Foundation Level – Prüfungstrainer 4.3
 
 Offline-Lernwerkzeug für die IREB-Prüfung CPRE Foundation Level.
 Grundlage: Lehrplan 3.3.0 (1. April 2026), Handbuch 1.3.3 (23. Juli 2026), Glossar 2.2.0 (Oktober 2025) und Prüfungsordnung 5.6.2.
@@ -12,6 +12,14 @@ Grundlage: Lehrplan 3.3.0 (1. April 2026), Handbuch 1.3.3 (23. Juli 2026), Gloss
 - **Lernmodus / Fehlertraining:** sofortiges Feedback mit Begründung und Quellenangabe.
 
 Oben rechts schaltest du zwischen hellem und dunklem Modus um. Ohne eigene Wahl folgt die Seite der Systemeinstellung. Diagramme bleiben auch im dunklen Modus auf weißem Grund.
+
+## Lernvariante 2: externer Fragenkatalog (nur lokal)
+Wenn die Datei `data/extern_certquiz.js` vorhanden ist, zeigt die Startseite einen zusätzlichen Bereich „Lernvariante 2: Fragenkatalog von CertQuiz“. Er enthält 306 Fragen aus einem Export von certquiz.app.
+- Der Katalog ist vom eigenen Pool getrennt. Er zählt nicht zur Prüfungssimulation und nicht zu „Dein Stand“. Er hat ein eigenes Fehlertraining.
+- Jede Frage hat einen Prüfvermerk gegen Lehrplan 3.3.0, Handbuch 1.3.3 und Glossar 2.2: ohne Befund, Hinweis, fragwürdig, außerhalb des Lehrplans, veraltet oder Schlüssel korrigiert.
+- 7 Fragen mit fehlerhafter oder mehrdeutiger Lösung sind ausgeblendet.
+- Standardmäßig werden nur lehrplanrelevante Fragen gezeigt.
+- Die Datei ist nur für die persönliche Prüfungsvorbereitung gedacht. Deshalb steht sie in `.gitignore` und ist nicht Teil des öffentlichen Repos.
 
 ## Bewertung (PO 5.6.2)
 - **A:** volle Punkte oder 0.
@@ -45,6 +53,7 @@ Oben rechts schaltest du zwischen hellem und dunklem Modus um. Ohne eigene Wahl 
 - Glossar 2.2 trennt Auftraggeber (bestellt das System) und Kunde (erhält das System). Eine Persona steht jetzt für Menschen, die das System nutzen oder davon profitieren. Keine Lösung im Pool ändert sich dadurch.
 
 ## Änderungsverlauf
+- **4.3 (16.11.2026):** Optionale Lernvariante 2 mit dem externen CertQuiz-Katalog: Prüfvermerke je Frage, korrigierte Schlüssel und drei neu gezeichnete Diagramme.
 - **4.2 (12.11.2026):** Befunde aus einem externen Einzelreview der 310 Fragen eingearbeitet.
   - 3-31 fragt jetzt nach fachlich geeigneten, nutzerzentrierten User Storys.
   - 3-43 nennt im Kontextdiagramm einen echten Informationsfluss.

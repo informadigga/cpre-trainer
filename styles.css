@@ -133,3 +133,20 @@ a{color:var(--accent)}
 :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
 input[type=radio],input[type=checkbox]{accent-color:var(--accent)}
 @media (max-width:600px){header.top button{padding:.3rem .55rem;font-size:.82rem}}
+/* Lernvariante 2 – externer Katalog */
+.fig{color:#1b2430}
+:root{--ext:#6b3fa0;--ext-bg:#f1eaf9}
+:root[data-theme="dark"]{--ext:#c9a8f0;--ext-bg:#2c2140}
+.tag.ext{background:var(--ext);color:var(--card)}
+.tag.st-hint{background:var(--accent2);color:var(--accent)}
+.tag.st-out{background:var(--tag-light);color:var(--muted);border:1px dashed var(--muted)}
+.tag.st-warn,.tag.st-fix{background:var(--partbg);color:var(--part)}
+.tag.st-bad{background:var(--badbg);color:var(--bad)}
+.extern-panel{border-left:5px solid var(--ext)}
+.ext-head{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.ext-head h2{margin:0}
+.ext-actions{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.6rem 0}
+.small-print{font-size:.85rem}
+.cq-note{margin-top:.8rem;border-left:4px solid var(--ext);background:var(--ext-bg);border-radius:6px;padding:.6rem .8rem;font-size:.92rem}
+.tag.st-warn,.tag.st-fix{color:#6e4a00}
+:root[data-theme="dark"] .tag.st-warn,:root[data-theme="dark"] .tag.st-fix{color:var(--part)}

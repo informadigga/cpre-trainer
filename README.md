@@ -1,4 +1,4 @@
-# CPRE Foundation Level – Prüfungstrainer 4.5
+# CPRE Foundation Level – Prüfungstrainer 4.6
 
 Offline-Lernwerkzeug für die IREB-Prüfung CPRE Foundation Level.
 Grundlage: Lehrplan 3.3.0 (1. April 2026), Handbuch 1.3.3 (23. Juli 2026), Glossar 2.2.0 (Oktober 2025) und Prüfungsordnung 5.6.2.
@@ -7,7 +7,9 @@ Grundlage: Lehrplan 3.3.0 (1. April 2026), Handbuch 1.3.3 (23. Juli 2026), Gloss
 ## Modi
 - **Prüfungssimulation:** 45 Fragen, 75 Minuten (90 Minuten mit Zeitverlängerung für Nicht-Muttersprachler). Die Verteilung entspricht genau der offiziellen Musterprüfung:
   LE 1–7 = 3 · 4 · 18 · 10 · 2 · 6 · 2 Fragen; 18 A-, 12 P- und 15 K-Fragen. Lösungen gibt es erst nach der Abgabe. Fragen, die du noch nicht gesehen hast, werden bevorzugt. Antwortoptionen und Aussagen werden gemischt.
-- **Offizielle Übungsprüfung:** die 45 Originalfragen aus Set_Public_DE_3.3.3 mit offiziellem Lösungsschlüssel, in Originalreihenfolge und ungemischt.
+- **Übungsprüfungen:** zwei komplette Prüfungen mit je 45 Fragen, in Originalreihenfolge und ungemischt.
+  - Prüfung 1: offizielle IREB-Übungsprüfung (Set_Public_DE_3.3.3) mit offiziellem Lösungsschlüssel.
+  - Prüfung 2: inoffizielle Übungsprüfung aus der Schulung (Maxpert GmbH), 70 Punkte, Schlüssel aus der Trainerfassung. Gegen Lehrplan 3.3.0 und Handbuch 1.3.3 geprüft. Ihre 45 Fragen sind zusätzlich Teil des allgemeinen Pools; dort bleibt die Antwortreihenfolge fest, weil Fragen und Erläuterungen auf Buchstaben verweisen.
 - **Kurztest:** 20 Fragen in 30 Minuten, verteilt wie die Musterprüfung im Kleinen.
 - **Lernmodus / Fehlertraining:** sofortiges Feedback mit Begründung und Quellenangabe.
 
@@ -51,6 +53,7 @@ Die Startseite zeigt unter „Dein Stand“ den Bereich „Lernvariante 2: Exter
 - Glossar 2.2 trennt Auftraggeber (bestellt das System) und Kunde (erhält das System). Eine Persona steht jetzt für Menschen, die das System nutzen oder davon profitieren. Keine Lösung im Pool ändert sich dadurch.
 
 ## Änderungsverlauf
+- **4.6 (17.11.2026):** Übungsprüfung 2 als eigene Prüfung (Button „Prüfung 2 starten“) und im allgemeinen Pool (jetzt 310 Fragen).
 - **4.5 (16.11.2026):** Externer Katalog nur noch mit lehrplanrelevanten Fragen (255), ohne Prüfvermerke; „Dein Stand“ steht davor.
 - **4.4 (16.11.2026):** CertQuiz-Katalog: 33 Fragen inhaltlich überarbeitet, Antwortlängen bei A-, P- und K-Fragen ausgeglichen.
 - **4.3 (16.11.2026):** Optionale Lernvariante 2 mit dem externen CertQuiz-Katalog: Prüfvermerke je Frage, korrigierte Schlüssel und drei neu gezeichnete Diagramme.

@@ -11,9 +11,13 @@ const PLANS={
   quick:{name:'Kurztest',le:[1,2,8,5,1,2,1],types:{a:8,p:5,k:7},minutes:30,feedback:false}
 };
 const KEY='cpre-fl-trainer-v4';
-const POOL=(window.POOL||[]).map(q=>Object.assign({src:'',lab:['Richtig','Falsch']},q,{origin:'pool'}));
+/* Übungsprüfung 2 (inoffiziell): eigene Prüfung und zusätzlich Teil des allgemeinen Pools.
+   fix: Antwortreihenfolge bleibt erhalten, weil Fragen und Erläuterungen auf Buchstaben verweisen. */
+const EX2=(window.EXAM2||[]).map(q=>Object.assign({lab:['Richtig','Falsch']},q,{origin:'ex2',fix:true,src:'Übungsprüfung 2, Frage '+(+q.id)}));
+const POOL=[...(window.POOL||[]).map(q=>Object.assign({src:'',lab:['Richtig','Falsch']},q,{origin:'pool'})),
+  ...EX2.map(q=>Object.assign({},q,{origin:'pool',id:'U2-'+q.id}))];
 const IREB=(window.IREB_EXAM||[]).map(q=>Object.assign({lab:['Richtig','Falsch']},q,{origin:'ireb'}));
-const BYID=new Map([...POOL,...IREB].map(q=>[q.origin+':'+q.id,q]));
+const BYID=new Map([...POOL,...IREB,...EX2].map(q=>[q.origin+':'+q.id,q]));
 /* Lernvariante 2: externer Fragenkatalog (optional, nur wenn data/extern_certquiz.js vorhanden ist) */
 let CQ=[],CQ_ALL=[],CQ_META=null;
 const CQ_STATUS={ok:['','Ohne Befund'],hinweis:['hint','Hinweis'],extern:['out','Außerhalb Lehrplan'],veraltet:['out','Veraltet'],'fragwürdig':['warn','Fragwürdig'],fehler:['fix','Schlüssel korrigiert'],'überarbeitet':['hint','Überarbeitet'],aus:['bad','Ausgeblendet']};
@@ -109,9 +113,9 @@ function pickLearn(eus,count,onlyWrong){
 let S=null,timer=null;
 function newSession(mode,qs,opts){
   stopTimer();
-  const fixedOrder=mode==='ireb';
+  const fixedOrder=mode==='ireb'||mode==='ex2';
   S={mode,name:opts.name,ids:qs.map(qkey),
-     perm:qs.map(q=>(fixedOrder||q.origin==='cq')?null:shuffle([...(q.t==='k'?q.s:q.o).keys()])),
+     perm:qs.map(q=>(fixedOrder||q.origin==='cq'||q.fix)?null:shuffle([...(q.t==='k'?q.s:q.o).keys()])),
      ans:qs.map(q=>q.t==='k'?Array(q.s.length).fill(null):null),
      checked:qs.map(()=>false),flag:qs.map(()=>false),at:0,
      feedback:!!opts.feedback,timed:!!opts.minutes,remaining:opts.minutes?opts.minutes*60:0,started:Date.now(),done:false};
@@ -144,7 +148,7 @@ function renderHome(){
   <section class="hero">
     <p class="eyebrow">IREB CPRE Foundation Level</p>
     <h1>Prüfungsnah üben – mit echten Fragetypen, echter Bewertung und belegten Lösungen.</h1>
-    <p class="lead">${POOL.length} eigene Fragen mit Quellenangabe zu Lehrplan 3.3.0 und Handbuch 1.3.3, dazu die offizielle IREB-Übungsprüfung. Jede Simulation folgt der Verteilung der Musterprüfung: 45 Fragen, 75 Minuten, mindestens 70 %.</p>
+    <p class="lead">${POOL.length} Fragen mit Quellenangabe zu Lehrplan 3.3.0 und Handbuch 1.3.3, dazu die offizielle IREB-Übungsprüfung und eine zweite Übungsprüfung. Jede Simulation folgt der Verteilung der Musterprüfung: 45 Fragen, 75 Minuten, mindestens 70 %.</p>
   </section>
   ${hasSession?`<div class="resume"><div><strong>Unterbrochene Sitzung:</strong> ${esc(DB.session.name)} · Frage ${DB.session.at+1} von ${DB.session.ids.length}${DB.session.timed?' · Restzeit '+fmtTime(DB.session.remaining):''}</div><div><button class="btn" id="resume">Fortsetzen</button> <button class="btn ghost" id="discard">Verwerfen</button></div></div>`:''}
   <div class="modes">
@@ -155,9 +159,13 @@ function renderHome(){
       <button class="btn" data-start="exam">Simulation starten</button>
     </article>
     <article class="mode">
-      <h2>Offizielle Übungsprüfung</h2>
-      <p>Die 45 Fragen der IREB-Übungsprüfung (Set 3.3.3) mit offiziellem Lösungsschlüssel, in Originalreihenfolge. Ideal als Abschlusstest – am besten erst ganz am Ende machen.</p>
-      <button class="btn" data-start="ireb">Übungsprüfung starten</button>
+      <h2>Übungsprüfungen</h2>
+      <p>Komplette Prüfungen mit 45 Fragen in 75 Minuten. Am besten erst ganz am Ende machen.</p>
+      <p class="muted small-print"><b>Prüfung 1:</b> offizielle IREB-Übungsprüfung${EX2.length?'<br><b>Prüfung 2:</b> Übungsprüfung aus der Schulung':''}</p>
+      <div class="ext-actions">
+        <button class="btn" data-start="ireb">Prüfung 1 starten</button>
+        ${EX2.length?'<button class="btn" data-start="ex2">Prüfung 2 starten</button>':''}
+      </div>
     </article>
     <article class="mode">
       <h2>Kurztest</h2>
@@ -231,6 +239,7 @@ function start(mode){
   if(mode==='exam'){const p=PLANS.exam;newSession('exam',pickExam(p),{name:p.name,minutes:DB.ext?90:75});}
   else if(mode==='quick'){const p=PLANS.quick;newSession('quick',pickExam(p),{name:p.name,minutes:30});}
   else if(mode==='ireb'){newSession('ireb',IREB,{name:'Offizielle IREB-Übungsprüfung',minutes:DB.ext?90:75});}
+  else if(mode==='ex2'){newSession('ex2',EX2,{name:'Übungsprüfung 2 (inoffiziell)',minutes:DB.ext?90:75});}
   else if(mode==='learn'){
     const eus=[...app.querySelectorAll('.le-pick input:checked')].map(i=>+i.value);
     if(!eus.length){alert('Bitte mindestens eine Lerneinheit wählen.');return;}
